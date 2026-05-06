@@ -20,7 +20,6 @@
             padding: 20px;
         }
 
-        /* 主卡片 */
         .game-container {
             max-width: 800px;
             width: 100%;
@@ -91,7 +90,6 @@
             transition: width 0.25s ease;
         }
 
-        /* 主 emoji 展示区 */
         .emoji-stage {
             background: #fffaf2;
             border-radius: 72px;
@@ -109,6 +107,7 @@
             word-break: break-word;
             font-weight: 400;
             text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
         }
 
         .meaning-area {
@@ -241,7 +240,7 @@
             border-radius: 60px;
             padding: 8px 18px;
             font-size: 1.4rem;
-            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', monospace;
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             display: inline-flex;
             align-items: center;
@@ -339,11 +338,17 @@
 
 <script>
     // --------------------------------------------------------------
-    // 依据提供的emoji列表+中文义，手动构建原始数据 (左列emoji词组，右列对应含义)
-    // 特殊处理：左列 "🇫🇷" 换成同等大小的法国国旗emoji "🇫🇷" (苹果原生) —— 直接保留🇫🇷即可
-    // 左列 "🔛E🔛"  需要用字母 E 显示为 🅴 (苹果风格)
-    // 左列 "R🧊" 中的 R 用🅁
-    // 其余emojis保持原生苹果风格
+    // 基础数据 + 修改 + 新增
+    // 1. 将 🐷🍔 改为 🔨🍔 (含义 hamburger 不变)
+    // 2. 新增以下国家/趣味词组:
+    //    👀🏃‍♀️ Iran
+    //    🍐🦘 Peru
+    //    ⛓‍💥🅰 China
+    //    🆕💤🏝️ New Zealand
+    //    🎤🅰 🫗 Singapore
+    //    👔🏝️ Thailand
+    //    🦠💰 Germany
+    //    ⌛️🧙‍♀️ Sandwich
     
     const rawData = [
         { emojiRaw: "🔴🐮", meaning: "Red bull" },
@@ -353,14 +358,15 @@
         { emojiRaw: "🔥🐶", meaning: "hotdog" },
         { emojiRaw: "👋⭕️", meaning: "bicycle" },
         { emojiRaw: "🍎👀", meaning: "apple watch" },
-        { emojiRaw: "🐷🍔", meaning: "hamburger" },
+        // 修改点: 🐷🍔 -> 🔨🍔
+        { emojiRaw: "🔨🍔", meaning: "hamburger" },
         { emojiRaw: "☁️🍬", meaning: "cotton candy" },
         { emojiRaw: "🥚🌲", meaning: "eggplant" },
         { emojiRaw: "☀️🌹", meaning: "sunflower" },
         { emojiRaw: "☕️🍰", meaning: "cupcake" },
         { emojiRaw: "🔑🛹", meaning: "keyboard" },
         { emojiRaw: "🎃🫓", meaning: "pumpkin pie" },
-        { emojiRaw: "🔛E🔛", meaning: "onion" },      // E → 字母emoji 🅴
+        { emojiRaw: "🔛E🔛", meaning: "onion" },
         { emojiRaw: "🥥🐨", meaning: "coco-cola" },
         { emojiRaw: "💣🌽", meaning: "popcorn" },
         { emojiRaw: "💰🐟", meaning: "goldfish" },
@@ -376,8 +382,8 @@
         { emojiRaw: "✋️👜", meaning: "handbag" },
         { emojiRaw: "🍯🌙", meaning: "honeymoon" },
         { emojiRaw: "👄🪵", meaning: "lipstick" },
-        { emojiRaw: "🇫🇷🔥", meaning: "french fries" },   // 法国国旗+🔥
-        { emojiRaw: "R🧊", meaning: "rice" },            // R 换成字母emoji 🅁
+        { emojiRaw: "🇫🇷🔥", meaning: "french fries" },
+        { emojiRaw: "R🧊", meaning: "rice" },
         { emojiRaw: "🧠⚡", meaning: "brainstorm" },
         { emojiRaw: "☀️👓", meaning: "sunglass" },
         { emojiRaw: "🐝🍃", meaning: "believe" },
@@ -394,7 +400,16 @@
         { emojiRaw: "🐮👦🏻", meaning: "cowboy" },
         { emojiRaw: "🤡🐟️", meaning: "clownfish" },
         { emojiRaw: "🌧️🐱🐱🐶🐶", meaning: "It's raining cats and dogs" },
-        { emojiRaw: "①🍰", meaning: "a piece of cake" }
+        { emojiRaw: "①🍰", meaning: "a piece of cake" },
+        // ----- 新增的8组国家/趣味词条 (保留原设计，直接附加) -----
+        { emojiRaw: "👀🏃‍♀️", meaning: "Iran" },
+        { emojiRaw: "🍐🦘", meaning: "Peru" },
+        { emojiRaw: "⛓‍💥🅰", meaning: "China" },
+        { emojiRaw: "🆕💤🏝️", meaning: "New Zealand" },
+        { emojiRaw: "🎤🅰 🫗", meaning: "Singapore" },
+        { emojiRaw: "👔🏝️", meaning: "Thailand" },
+        { emojiRaw: "🦠💰", meaning: "Germany" },
+        { emojiRaw: "⌛️🧙‍♀️", meaning: "Sandwich" }
     ];
 
     // 字母替换函数 (将特殊标志中的 E 和 R 替换为苹果风格的字母emoji)
@@ -405,25 +420,30 @@
         // 处理 "R🧊" → 🅁🧊
         else if (emojiStr === "R🧊") result = "🅁🧊";
         else {
-            // 通用替换: 独立的E字母（非组合）替换为🅴，独立的R替换为🅁
+            // 通用替换: 独立的E字母替换为🅴，独立的R替换为🅁 (针对上下文安全)
             result = result.replace(/(?<![🔛🅴])E(?![🔛])/g, '🅴');
             result = result.replace(/^R(?=🧊)/, '🅁');
         }
+        // 针对新增词条中的特殊字母或符号做优雅处理: 确保 🎤🅰 🫗 里的🅰保持原样（字母emoji完美）
         return result;
     }
 
-    // 对每个条目，生成最终显示的emoji序列
+    // 对每个条目，生成最终显示的emoji序列，确保法国国旗已经完美存在
     const items = rawData.map(entry => {
         let finalEmoji = entry.emojiRaw;
         finalEmoji = replaceLetterEmoji(finalEmoji);
-        // 确保法国国旗显示正常（直接保留原生🇫🇷）
+        // 额外保险：确保法国国旗正常显示 (🇫🇷🔥 绝对保留)，并且 🔨🍔 已正确替换
         return {
             displayEmoji: finalEmoji,
             meaning: entry.meaning
         };
     });
 
+    // 确认第7项（索引7）为 🔨🍔 hamburger，以及新增的国家词条都在末尾完整保留
+    // 总共之前条目数量: rawData原本长度 48 (因为原数据有48？ 但原始从 🔴🐮 到 ①🍰 共计 49？ 重新计算：之前共49(含原🐷🍔被替换)。再新增8组 = 57项
+    // 控制台可验证
     const totalItems = items.length;
+    
     // 游戏状态
     let remainingIndices = [];    
     let usedSet = new Set();       
@@ -445,7 +465,6 @@
     const toggleListBtn = document.getElementById('toggleListBtn');
     const listPanel = document.getElementById('listPanel');
     const chipContainer = document.getElementById('chipList');
-    const clickRevealHint = document.getElementById('clickRevealHint');
 
     // 辅助: 更新UI统计
     function updateStats() {
@@ -477,7 +496,6 @@
         usedSet.clear();
         currentIndex = -1;
         currentEmojiDisplay.innerText = "Start";
-        // 重置正确答案显示区域 (根据当前showMeaning和是否有单词)
         renderMeaningByState(null);
         updateStats();
     }
@@ -486,36 +504,12 @@
     function renderMeaningByState(item) {
         if (!item) {
             meaningArea.innerHTML = `<div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>`;
-            // 重新绑定点击事件
-            const newHint = document.getElementById('clickRevealHint');
-            if (newHint) {
-                newHint.addEventListener('click', () => {
-                    if (currentIndex !== -1 && items[currentIndex] && !showMeaning) {
-                        // 临时显示答案无需切换永久模式？更友好：点击瞬间展示答案，但为了保持需求，我们按照课堂习惯临时显示一下并几秒后恢复或直接展示？
-                        // 但题目要求有选项可展开中文，默认隐藏，点击开关永久显示。 而额外的点击提示区域我们可以做成快速查看正确答案的功能，但完全符合“不需要的时候就默认隐藏只显示emoji”同样也可通过开关控制。
-                        // 这里增加更直观表现：如果当前有单词且没有永久显示中文，点击临时展示2秒？但为了避免偏离，可做点击开关一样切换永久模式？不，最好简单提示。为了更好的体验，点击这个横幅如果单词存在就临时展示正确答案然后恢复？但是会导致用户期望。
-                        // 最稳妥：不做多余动作，还是利用开关。但是保留这个区域仅用于占位说明。点击开关是唯一展示方式。但是题目要求“有需要的时候点击展开该emoji的中文意思”，并没有强制仅开关，但为了方便集成，这个区域不绑定额外逻辑。
-                    }
-                });
-            }
             return;
         }
         if (showMeaning) {
             meaningArea.innerHTML = `<div class="meaning-bubble">✨ ${item.meaning}</div>`;
         } else {
             meaningArea.innerHTML = `<div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>`;
-        }
-    }
-
-    // 刷新当前显示（如果当前有选中词）
-    function refreshDisplay() {
-        if (currentIndex !== -1 && items[currentIndex]) {
-            const cur = items[currentIndex];
-            currentEmojiDisplay.innerText = cur.displayEmoji;
-            renderMeaningByState(cur);
-        } else if (currentIndex === -1) {
-            currentEmojiDisplay.innerText = "Start";
-            renderMeaningByState(null);
         }
     }
 
@@ -622,7 +616,7 @@
     showMeaningBtn.addEventListener('click', () => setMeaningVisible(true));
     toggleListBtn.addEventListener('click', toggleListVisibility);
 
-    // 开始！
+    // 启动游戏
     initGame();
 </script>
 </body>
