@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Emoji Challenge · 课堂随机挑战</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f7f3e9 0%, #f0ebdf 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 主卡片 */
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 250, 240, 0.92);
+            backdrop-filter: blur(4px);
+            border-radius: 64px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 32px 28px 40px;
+            border: 1px solid rgba(255, 245, 220, 0.8);
+            transition: all 0.2s;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d43f1f, #e68a2e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f7ebd4;
+            border-radius: 48px;
+            padding: 10px 20px;
+            margin: 20px 0 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .progress-text {
+            font-weight: 600;
+            background: white;
+            padding: 6px 18px;
+            border-radius: 32px;
+            color: #bd6b1e;
+            font-size: 0.9rem;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-wrapper {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .progress-bar-bg {
+            background-color: #e2cfb0;
+            border-radius: 30px;
+            height: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px #b49363;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #e67e22, #f39c12);
+            width: 0%;
+            height: 100%;
+            border-radius: 30px;
+            transition: width 0.25s ease;
+        }
+
+        /* 主 emoji 展示区 */
+        .emoji-stage {
+            background: #fffaf2;
+            border-radius: 72px;
+            padding: 40px 20px;
+            text-align: center;
+            margin: 12px 0 28px;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2), inset 0 1px 4px rgba(255, 255, 245, 0.8);
+            border: 2px solid #ffe1b3;
+        }
+
+        .main-emoji {
+            font-size: 5.8rem;
+            line-height: 1.2;
+            letter-spacing: 12px;
+            word-break: break-word;
+            font-weight: 400;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .meaning-area {
+            margin-top: 28px;
+            min-height: 80px;
+        }
+
+        .meaning-bubble {
+            background: #f7e7d3;
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-size: 1.7rem;
+            font-weight: 500;
+            color: #b45f2b;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            max-width: 90%;
+            word-break: break-word;
+        }
+
+        .meaning-hidden {
+            background: #ede0cd;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #a76f3a;
+            display: inline-block;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        
+        .meaning-hidden:hover {
+            background: #e2d0b6;
+            transform: scale(0.98);
+        }
+
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+            margin: 35px 0 20px;
+        }
+
+        button {
+            background: white;
+            border: none;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 48px;
+            font-size: 1.2rem;
+            box-shadow: 0 6px 0 #c29a6b;
+            cursor: pointer;
+            transition: 0.08s linear;
+            color: #8b4c1c;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #ffe3be;
+        }
+
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #b5834a;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            transform: translateY(0);
+            cursor: default;
+            pointer-events: none;
+            filter: grayscale(0.1);
+        }
+
+        .sec-btn {
+            background: #faeedf;
+            box-shadow: 0 4px 0 #cb9f70;
+            font-size: 1rem;
+            padding: 12px 22px;
+        }
+
+        .toggle-group {
+            background: #f5e8d8;
+            border-radius: 48px;
+            display: inline-flex;
+            padding: 6px;
+            margin: 15px auto 10px;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toggle-option {
+            padding: 8px 28px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.95rem;
+            background: transparent;
+            color: #8f5f34;
+        }
+
+        .toggle-option.active {
+            background: #f7efdf;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            color: #c25d1a;
+            font-weight: 600;
+        }
+
+        .word-list-panel {
+            margin-top: 35px;
+            background: #fef6ec;
+            border-radius: 48px;
+            padding: 18px 16px;
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid #f7e2c6;
+        }
+
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .emoji-chip {
+            background: white;
+            border-radius: 60px;
+            padding: 8px 18px;
+            font-size: 1.4rem;
+            font-family: 'Apple Color Emoji', 'Segoe UI Emoji', monospace;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.05s linear;
+            border: 1px solid #f8e0c0;
+        }
+
+        .emoji-chip.used {
+            opacity: 0.5;
+            background: #e6d5be;
+            text-decoration: line-through;
+            filter: grayscale(0.1);
+            order: 1;
+        }
+
+        .small-footnote {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #b48246;
+            margin-top: 30px;
+            border-top: 1px dashed #e7d2b8;
+            padding-top: 20px;
+        }
+
+        @media (max-width: 520px) {
+            .main-emoji {
+                font-size: 3.8rem;
+                letter-spacing: 5px;
+            }
+            .game-container {
+                padding: 22px 18px;
+            }
+            button {
+                padding: 10px 24px;
+                font-size: 1rem;
+            }
+            .meaning-hidden {
+                font-size: 1rem;
+                padding: 8px 20px;
+            }
+            .meaning-bubble {
+                font-size: 1.2rem;
+                padding: 10px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="app">
+    <h1>
+        🎲  Emoji Challenge
+    </h1>
+    <div class="stats-bar">
+        <div class="progress-text">📋 已抽 <span id="usedCount">0</span> / <span id="totalCount">0</span></div>
+        <div class="progress-wrapper">
+            <div class="progress-bar-bg"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="progress-text">✨ 剩余 <span id="remainingCount">0</span></div>
+    </div>
+
+    <!-- 主显示区 -->
+    <div class="emoji-stage">
+        <div class="main-emoji" id="currentEmojiDisplay">Start</div>
+        <div class="meaning-area" id="meaningArea">
+            <div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>
+        </div>
+    </div>
+
+    <div class="control-group">
+        <button id="drawBtn">🎲 随机抽取一组</button>
+        <button id="resetBtn" class="sec-btn">🔄 重置本轮</button>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin: 4px 0 8px;">
+        <div class="toggle-group" id="toggleMeaning">
+            <span class="toggle-option active" id="hideMeaningBtn">🔒 Correct Answer</span>
+            <span class="toggle-option" id="showMeaningBtn">📖 Correct Answer</span>
+        </div>
+    </div>
+
+    <!-- 剩余单词列表面板 (可展开) -->
+    <div id="listPanel" class="word-list-panel" style="display: none;">
+        <div style="font-weight: 600; margin-bottom: 12px;">📌 全部词条 (灰色为已抽)</div>
+        <div class="chip-container" id="chipList"></div>
+        <div class="small-footnote" style="margin-top: 12px;">点击重置可开始全新一轮不重复抽取</div>
+    </div>
+    <div style="display: flex; justify-content: center; margin-top: 16px;">
+        <button id="toggleListBtn" class="sec-btn" style="background:#f2e3d2;">📋 显示/隐藏 完整列表</button>
+    </div>
+    <div class="small-footnote">
+        🌀 每次抽取不重复，一轮完成后自动重置，享受课堂趣味
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // 依据提供的emoji列表+中文义，手动构建原始数据 (左列emoji词组，右列对应含义)
+    // 特殊处理：左列 "🇫🇷" 换成同等大小的法国国旗emoji "🇫🇷" (苹果原生) —— 直接保留🇫🇷即可
+    // 左列 "🔛E🔛"  需要用字母 E 显示为 🅴 (苹果风格)
+    // 左列 "R🧊" 中的 R 用🅁
+    // 其余emojis保持原生苹果风格
+    
+    const rawData = [
+        { emojiRaw: "🔴🐮", meaning: "Red bull" },
+        { emojiRaw: "😊🐴", meaning: "Happy Horse" },
+        { emojiRaw: "🧈✈️", meaning: "butterfly" },
+        { emojiRaw: "🐲✈️", meaning: "dragonfly" },
+        { emojiRaw: "🔥🐶", meaning: "hotdog" },
+        { emojiRaw: "👋⭕️", meaning: "bicycle" },
+        { emojiRaw: "🍎👀", meaning: "apple watch" },
+        { emojiRaw: "🐷🍔", meaning: "hamburger" },
+        { emojiRaw: "☁️🍬", meaning: "cotton candy" },
+        { emojiRaw: "🥚🌲", meaning: "eggplant" },
+        { emojiRaw: "☀️🌹", meaning: "sunflower" },
+        { emojiRaw: "☕️🍰", meaning: "cupcake" },
+        { emojiRaw: "🔑🛹", meaning: "keyboard" },
+        { emojiRaw: "🎃🫓", meaning: "pumpkin pie" },
+        { emojiRaw: "🔛E🔛", meaning: "onion" },      // E → 字母emoji 🅴
+        { emojiRaw: "🥥🐨", meaning: "coco-cola" },
+        { emojiRaw: "💣🌽", meaning: "popcorn" },
+        { emojiRaw: "💰🐟", meaning: "goldfish" },
+        { emojiRaw: "🚨👦", meaning: "policeman" },
+        { emojiRaw: "🛞💺", meaning: "wheelchair" },
+        { emojiRaw: "☂️🏹", meaning: "rainbow" },
+        { emojiRaw: "🔥💼", meaning: "firework" },
+        { emojiRaw: "🍳🍰", meaning: "pancake" },
+        { emojiRaw: "🥩⚽", meaning: "meatball" },
+        { emojiRaw: "📦🎤", meaning: "boxing" },
+        { emojiRaw: "👂💍", meaning: "earing" },
+        { emojiRaw: "🌊🐴", meaning: "seahorse" },
+        { emojiRaw: "✋️👜", meaning: "handbag" },
+        { emojiRaw: "🍯🌙", meaning: "honeymoon" },
+        { emojiRaw: "👄🪵", meaning: "lipstick" },
+        { emojiRaw: "🇫🇷🔥", meaning: "french fries" },   // 法国国旗+🔥
+        { emojiRaw: "R🧊", meaning: "rice" },            // R 换成字母emoji 🅁
+        { emojiRaw: "🧠⚡", meaning: "brainstorm" },
+        { emojiRaw: "☀️👓", meaning: "sunglass" },
+        { emojiRaw: "🐝🍃", meaning: "believe" },
+        { emojiRaw: "🥛🤝", meaning: "milkshake" },
+        { emojiRaw: "🌲🍎", meaning: "pineapple" },
+        { emojiRaw: "🌧️🧥", meaning: "raincoat" },
+        { emojiRaw: "🌙🍰", meaning: "mooncake" },
+        { emojiRaw: "🌧️❌️", meaning: "rhino" },
+        { emojiRaw: "🔔🏋", meaning: "Belgium" },
+        { emojiRaw: "👨‍🍳🔑", meaning: "cookie" },
+        { emojiRaw: "🥛🍵", meaning: "milk tea" },
+        { emojiRaw: "🐝👂", meaning: "bear" },
+        { emojiRaw: "👗⬆", meaning: "dress up" },
+        { emojiRaw: "🐮👦🏻", meaning: "cowboy" },
+        { emojiRaw: "🤡🐟️", meaning: "clownfish" },
+        { emojiRaw: "🌧️🐱🐱🐶🐶", meaning: "It's raining cats and dogs" },
+        { emojiRaw: "①🍰", meaning: "a piece of cake" }
+    ];
+
+    // 字母替换函数 (将特殊标志中的 E 和 R 替换为苹果风格的字母emoji)
+    function replaceLetterEmoji(emojiStr) {
+        let result = emojiStr;
+        // 单独处理 "🔛E🔛" → 🔛🅴🔛
+        if (emojiStr === "🔛E🔛") result = "🔛🅴🔛";
+        // 处理 "R🧊" → 🅁🧊
+        else if (emojiStr === "R🧊") result = "🅁🧊";
+        else {
+            // 通用替换: 独立的E字母（非组合）替换为🅴，独立的R替换为🅁
+            result = result.replace(/(?<![🔛🅴])E(?![🔛])/g, '🅴');
+            result = result.replace(/^R(?=🧊)/, '🅁');
+        }
+        return result;
+    }
+
+    // 对每个条目，生成最终显示的emoji序列
+    const items = rawData.map(entry => {
+        let finalEmoji = entry.emojiRaw;
+        finalEmoji = replaceLetterEmoji(finalEmoji);
+        // 确保法国国旗显示正常（直接保留原生🇫🇷）
+        return {
+            displayEmoji: finalEmoji,
+            meaning: entry.meaning
+        };
+    });
+
+    const totalItems = items.length;
+    // 游戏状态
+    let remainingIndices = [];    
+    let usedSet = new Set();       
+    let currentIndex = -1;         
+    let showMeaning = false;        // 默认隐藏正确答案
+    let showList = false;           
+
+    // DOM 元素
+    const currentEmojiDisplay = document.getElementById('currentEmojiDisplay');
+    const meaningArea = document.getElementById('meaningArea');
+    const usedCountSpan = document.getElementById('usedCount');
+    const totalCountSpan = document.getElementById('totalCount');
+    const remainingCountSpan = document.getElementById('remainingCount');
+    const progressFillDiv = document.getElementById('progressFill');
+    const drawBtn = document.getElementById('drawBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const hideMeaningBtn = document.getElementById('hideMeaningBtn');
+    const showMeaningBtn = document.getElementById('showMeaningBtn');
+    const toggleListBtn = document.getElementById('toggleListBtn');
+    const listPanel = document.getElementById('listPanel');
+    const chipContainer = document.getElementById('chipList');
+    const clickRevealHint = document.getElementById('clickRevealHint');
+
+    // 辅助: 更新UI统计
+    function updateStats() {
+        const usedCount = usedSet.size;
+        usedCountSpan.innerText = usedCount;
+        totalCountSpan.innerText = totalItems;
+        const remainingCount = remainingIndices.length;
+        remainingCountSpan.innerText = remainingCount;
+        const percent = totalItems === 0 ? 0 : (usedCount / totalItems) * 100;
+        progressFillDiv.style.width = percent + '%';
+
+        // 自动重置: 如果剩余为0且总数>0, 重置本轮 (开启新循环)
+        if (remainingIndices.length === 0 && totalItems > 0 && usedSet.size === totalItems) {
+            resetGameForNewCycle();
+        }
+        if (showList) renderChipList();
+    }
+
+    // 重置为新的一轮 (不清除当前显示单词，但重置索引池)
+    function resetGameForNewCycle() {
+        remainingIndices = Array.from({ length: totalItems }, (_, i) => i);
+        usedSet.clear();
+        updateStats();
+    }
+
+    // 手动重置全部 (清空状态并把显示重置为Start)
+    function resetFullRound() {
+        remainingIndices = Array.from({ length: totalItems }, (_, i) => i);
+        usedSet.clear();
+        currentIndex = -1;
+        currentEmojiDisplay.innerText = "Start";
+        // 重置正确答案显示区域 (根据当前showMeaning和是否有单词)
+        renderMeaningByState(null);
+        updateStats();
+    }
+
+    // 根据显示开关展示当前含义
+    function renderMeaningByState(item) {
+        if (!item) {
+            meaningArea.innerHTML = `<div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>`;
+            // 重新绑定点击事件
+            const newHint = document.getElementById('clickRevealHint');
+            if (newHint) {
+                newHint.addEventListener('click', () => {
+                    if (currentIndex !== -1 && items[currentIndex] && !showMeaning) {
+                        // 临时显示答案无需切换永久模式？更友好：点击瞬间展示答案，但为了保持需求，我们按照课堂习惯临时显示一下并几秒后恢复或直接展示？
+                        // 但题目要求有选项可展开中文，默认隐藏，点击开关永久显示。 而额外的点击提示区域我们可以做成快速查看正确答案的功能，但完全符合“不需要的时候就默认隐藏只显示emoji”同样也可通过开关控制。
+                        // 这里增加更直观表现：如果当前有单词且没有永久显示中文，点击临时展示2秒？但为了避免偏离，可做点击开关一样切换永久模式？不，最好简单提示。为了更好的体验，点击这个横幅如果单词存在就临时展示正确答案然后恢复？但是会导致用户期望。
+                        // 最稳妥：不做多余动作，还是利用开关。但是保留这个区域仅用于占位说明。点击开关是唯一展示方式。但是题目要求“有需要的时候点击展开该emoji的中文意思”，并没有强制仅开关，但为了方便集成，这个区域不绑定额外逻辑。
+                    }
+                });
+            }
+            return;
+        }
+        if (showMeaning) {
+            meaningArea.innerHTML = `<div class="meaning-bubble">✨ ${item.meaning}</div>`;
+        } else {
+            meaningArea.innerHTML = `<div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>`;
+        }
+    }
+
+    // 刷新当前显示（如果当前有选中词）
+    function refreshDisplay() {
+        if (currentIndex !== -1 && items[currentIndex]) {
+            const cur = items[currentIndex];
+            currentEmojiDisplay.innerText = cur.displayEmoji;
+            renderMeaningByState(cur);
+        } else if (currentIndex === -1) {
+            currentEmojiDisplay.innerText = "Start";
+            renderMeaningByState(null);
+        }
+    }
+
+    // 抽选不重复单词
+    function drawRandom() {
+        if (totalItems === 0) return;
+        // 若剩余索引为空则重置
+        if (remainingIndices.length === 0 && usedSet.size === totalItems) {
+            resetGameForNewCycle();
+        }
+        if (remainingIndices.length === 0) {
+            resetFullRound();
+        }
+
+        const randomPos = Math.floor(Math.random() * remainingIndices.length);
+        const chosenIdx = remainingIndices[randomPos];
+        remainingIndices.splice(randomPos, 1);
+        usedSet.add(chosenIdx);
+        currentIndex = chosenIdx;
+        const selectedItem = items[currentIndex];
+        currentEmojiDisplay.innerText = selectedItem.displayEmoji;
+        if (showMeaning) {
+            meaningArea.innerHTML = `<div class="meaning-bubble">✨ ${selectedItem.meaning}</div>`;
+        } else {
+            meaningArea.innerHTML = `<div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>`;
+        }
+        updateStats();
+        if (showList) renderChipList();
+    }
+
+    // 生成列表 chips
+    function renderChipList() {
+        if (!chipContainer) return;
+        let html = '';
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const isUsed = usedSet.has(i);
+            const usedClass = isUsed ? 'used' : '';
+            html += `<span class="emoji-chip ${usedClass}" title="${item.meaning}">${item.displayEmoji}</span>`;
+        }
+        chipContainer.innerHTML = html;
+    }
+
+    // 切换列表显示
+    function toggleListVisibility() {
+        showList = !showList;
+        if (showList) {
+            listPanel.style.display = 'block';
+            renderChipList();
+            toggleListBtn.innerText = '📖 隐藏完整列表';
+        } else {
+            listPanel.style.display = 'none';
+            toggleListBtn.innerText = '📋 显示/隐藏 完整列表';
+        }
+    }
+
+    // 切换中文显示（Correct Answer 可见性）
+    function setMeaningVisible(visible) {
+        showMeaning = visible;
+        if (visible) {
+            hideMeaningBtn.classList.remove('active');
+            showMeaningBtn.classList.add('active');
+        } else {
+            hideMeaningBtn.classList.add('active');
+            showMeaningBtn.classList.remove('active');
+        }
+        if (currentIndex !== -1 && items[currentIndex]) {
+            const curItem = items[currentIndex];
+            if (showMeaning) {
+                meaningArea.innerHTML = `<div class="meaning-bubble">✨ ${curItem.meaning}</div>`;
+            } else {
+                meaningArea.innerHTML = `<div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>`;
+            }
+        } else {
+            if (showMeaning) {
+                meaningArea.innerHTML = `<div class="meaning-hidden">✨ Correct Answer ✨</div>`;
+            } else {
+                meaningArea.innerHTML = `<div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>`;
+            }
+        }
+    }
+
+    // 页面初始: 构建剩余队列，均未抽取
+    function initGame() {
+        remainingIndices = Array.from({ length: totalItems }, (_, i) => i);
+        usedSet.clear();
+        currentIndex = -1;
+        showMeaning = false;
+        showList = false;
+        listPanel.style.display = 'none';
+        toggleListBtn.innerText = '📋 显示/隐藏 完整列表';
+        setMeaningVisible(false);
+        currentEmojiDisplay.innerText = "Start";
+        meaningArea.innerHTML = `<div class="meaning-hidden" id="clickRevealHint">✨ Correct Answer ✨</div>`;
+        updateStats();
+    }
+
+    // 事件绑定
+    drawBtn.addEventListener('click', drawRandom);
+    resetBtn.addEventListener('click', () => {
+        resetFullRound();
+    });
+    hideMeaningBtn.addEventListener('click', () => setMeaningVisible(false));
+    showMeaningBtn.addEventListener('click', () => setMeaningVisible(true));
+    toggleListBtn.addEventListener('click', toggleListVisibility);
+
+    // 开始！
+    initGame();
+</script>
+</body>
+</html>
